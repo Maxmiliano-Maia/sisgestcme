@@ -8,8 +8,11 @@
 
 <body>
 
-<input id="email" placeholder="Email">
-<input id="senha" type="password" placeholder="Senha">
+<form id="loginForm">
+
+<input id="email" type="email" placeholder="Email" required autocomplete="username">
+
+<input id="senha" type="password" placeholder="Senha" required autocomplete="username">
 
 <select id="setor">
   <option value="expurgo">Expurgo</option>
@@ -19,10 +22,36 @@
   <option value="distribuicao">Distribuição</option>
 </select>
 
-<button id="btnEntrar">Entrar</button>
-<button id="btnRegistrar">Registrar</button>
+<button type="submit" id="btnEntrar">Entrar</button>
+<button id="btnResetSenha">
+Esqueci minha senha
+</button>
+<button type="button" id="btnRegistrar">Registrar</button>
+
+</form>
 
 <script type="module">
+import { recuperarSenha } from "./auth.js";
+
+document
+.getElementById("btnResetSenha")
+.addEventListener("click", () => {
+
+  const email = document
+  .getElementById("email")
+  .value;
+
+  if (!email) {
+
+    alert("Digite seu email primeiro!");
+
+    return;
+
+  }
+
+  recuperarSenha(email);
+
+});
 
 import { login, cadastrar } from './auth.js';
 import { auth } from "./firebase.js";
@@ -36,7 +65,9 @@ const btnEntrar = document.getElementById("btnEntrar");
 const btnRegistrar = document.getElementById("btnRegistrar");
 
 // LOGIN
-btnEntrar.addEventListener("click", async () => {
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+
+  e.preventDefault();
 
   const email = emailInput.value.trim();
   const senha = senhaInput.value.trim();
@@ -46,16 +77,13 @@ btnEntrar.addEventListener("click", async () => {
     return;
   }
 
-  btnEntrar.disabled = true;
-
   try {
     await login(email, senha);
-    window.location.href = "index.html";
+    window.location.replace("index.html");
   } catch (e) {
     alert("Erro ao logar: " + e.message);
   }
 
-  btnEntrar.disabled = false;
 });
 
 // REGISTRAR

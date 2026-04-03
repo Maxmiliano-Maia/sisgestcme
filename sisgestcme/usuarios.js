@@ -62,25 +62,62 @@ function carregarUsuarios() {
       return;
     }
 
-    for (let uid in dados) {
-      let u = dados[uid];
+for (let uid in dados) {
 
-   listaUsuarios.innerHTML += `
-      <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-        <strong>${u.email}</strong><br>
+  let u = dados[uid];
 
-        Setor:
-        <select onchange="alterarSetor('${uid}', this.value)">
-          <option value="expurgo" ${u.setor === "expurgo" ? "selected" : ""}>expurgo</option>
-          <option value="lavagem" ${u.setor === "lavagem" ? "selected" : ""}>lavagem</option>
-          <option value="preparo" ${u.setor === "preparo" ? "selected" : ""}>preparo</option>
-          <option value="esterilizacao" ${u.setor === "esterilizacao" ? "selected" : ""}>esterilizacao</option>
-          <option value="distribuicao" ${u.setor === "distribuicao" ? "selected" : ""}>distribuicao</option>
-          <option value="admin" ${u.setor === "admin" ? "selected" : ""}>admin</option>
-        </select>
-      </div>
-    `;
+  const div = document.createElement("div");
+  div.style.border = "1px solid #ccc";
+  div.style.padding = "10px";
+  div.style.margin = "10px";
+
+  // email
+  const strong = document.createElement("strong");
+  strong.textContent = u.email;
+  div.appendChild(strong);
+
+  div.appendChild(document.createElement("br"));
+
+  // texto setor
+  const textoSetor = document.createElement("span");
+  textoSetor.textContent = "Setor: ";
+  div.appendChild(textoSetor);
+
+  // select
+  const select = document.createElement("select");
+
+  const setores = [
+    "expurgo",
+    "lavagem",
+    "preparo",
+    "esterilizacao",
+    "distribuicao",
+    "admin"
+  ];
+
+  setores.forEach(s => {
+
+    const option = document.createElement("option");
+    option.value = s;
+    option.textContent = s;
+
+    if (u.setor === s) {
+      option.selected = true;
     }
+
+    select.appendChild(option);
+
+  });
+
+  select.addEventListener("change", (e) => {
+    alterarSetor(uid, e.target.value);
+  });
+
+  div.appendChild(select);
+
+  listaUsuarios.appendChild(div);
+
+}
   });
 }
 

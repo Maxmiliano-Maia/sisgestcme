@@ -1,6 +1,7 @@
 import { auth, db } from "./firebase.js";
 
 import {
+  sendPasswordResetEmail,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut
@@ -10,6 +11,7 @@ import {
   ref,
   set
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
 
 // CADASTRAR COM SETOR
 export async function cadastrar(email, senha, setor) {
@@ -41,4 +43,20 @@ export function login(email, senha) {
 // LOGOUT
 export function logout() {
   return signOut(auth);
+}
+
+export async function recuperarSenha(email) {
+
+  try {
+
+    await sendPasswordResetEmail(auth, email);
+
+    alert("Email de recuperação enviado!");
+
+  } catch (error) {
+
+    alert("Erro: " + error.message);
+
+  }
+
 }

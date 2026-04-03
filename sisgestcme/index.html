@@ -3,12 +3,15 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Sistema</title>
-
+  <title>Sistema de Controle de Materiais</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sistema de controle de materiais hospitalares">
 </head>
 
 <body>
 
+<div id="infoUsuario"></div>
+<hr>
 <button id="btnLogout">Sair</button>
 <button id="btnUsuarios" style="display: none;">
   Gerenciar Usuários
@@ -89,11 +92,15 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   setorUsuario = dados.setor;
-  isAdmin = setorUsuario === "admin";
+  isAdmin = dados?.setor === "admin";
 
   if (isAdmin) {
     btnUsuarios.style.display = "inline-block";
   }
+
+  const info = document.getElementById("infoUsuario");
+  info.textContent = `Usuário: ${dados.email} | Permissão: ${dados.setor}`;
+
 
   listarMateriais((dados) => {
     const lista = document.getElementById("lista");
@@ -101,26 +108,72 @@ onAuthStateChanged(auth, async (user) => {
 
     if (!dados) return;
 
-    for (let id in dados) {
-      let m = dados[id];
+for (let id in dados) {
 
-      lista.innerHTML += `
-        <div>
-          ${m.descricao} (${m.lote})<br>
-          Status: ${m.status}
+  let m = dados[id];
 
-          <select onchange="mudar('${id}', this.value)">
-            <option ${m.status === "expurgo" ? "selected" : ""}>expurgo</option>
-            <option ${m.status === "lavagem" ? "selected" : ""}>lavagem</option>
-            <option ${m.status === "esterilizacao" ? "selected" : ""}>esterilizacao</option>
-            <option ${m.status === "distribuicao" ? "selected" : ""}>distribuicao</option>
-          </select>
+  const div = document.createElement("div");
 
-          ${isAdmin ? `<button onclick="excluir('${id}')">Excluir</button>` : ''}
-        </div>
-        <hr>
-      `;
+  // texto descrição
+  const texto = document.createElement("div");
+  texto.textContent = `${m.descricao} (${m.lote})`;
+  div.appendChild(texto);
+
+  // status
+  const status = document.createElement("div");
+  status.textContent = `Status: ${m.status}`;
+  div.appendChild(status);
+
+  // select
+  const select = document.createElement("select");
+
+  const setores = [
+    "expurgo",
+    "lavagem",
+    "esterilizacao",
+    "distribuicao"
+  ];
+
+  setores.forEach(s => {
+
+    const option = document.createElement("option");
+    option.value = s;
+    option.textContent = s;
+
+    if (m.status === s) {
+      option.selected = true;
     }
+
+    select.appendChild(option);
+
+  });
+
+  select.addEventListener("change", (e) => {
+    mudar(id, e.target.value);
+  });
+
+  div.appendChild(select);
+
+  // botão excluir
+  if (isAdmin) {
+
+    const btn = document.createElement("button");
+    btn.textContent = "Excluir";
+
+    btn.addEventListener("click", () => {
+      excluir(id);
+    });
+
+    div.appendChild(btn);
+
+  }
+
+  lista.appendChild(div);
+
+  const hr = document.createElement("hr");
+  lista.appendChild(hr);
+
+}
   });
 });
 
