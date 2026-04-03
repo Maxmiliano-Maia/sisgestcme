@@ -1,46 +1,20 @@
-<script type="module">
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciar Usuários</title>
+</head>
 
-import { ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { db } from "./firebase.js";
+<body>
 
-// 🔒 controle de admin (ajuste conforme seu sistema)
-let isAdmin = true; // depois você liga com seu auth
+<button id="btnVoltar">⬅ Voltar</button>
+<button id="btnLogout">🚪 Sair</button>
 
-const listaUsuarios = document.getElementById("listaUsuarios");
+<h2>Painel de Usuários</h2>
 
-// LISTAR USUÁRIOS
-onValue(ref(db, "usuarios"), (snap) => {
-  const dados = snap.val();
+<div id="listaUsuarios"></div>
 
-  listaUsuarios.innerHTML = "";
+<script type="module" src="usuarios.js"></script>
 
-  if (!dados) {
-    listaUsuarios.innerHTML = "Nenhum usuário encontrado";
-    return;
-  }
-
-  for (let uid in dados) {
-    let u = dados[uid];
-
-    listaUsuarios.innerHTML += `
-      <div>
-        ${u.email} - ${u.setor}
-
-        ${isAdmin ? `<button onclick="removerUsuario('${uid}')">Excluir</button>` : ""}
-      </div>
-    `;
-  }
-});
-
-// EXCLUIR USUÁRIO
-window.removerUsuario = (uid) => {
-
-  if (!isAdmin) {
-    alert("Só admin!");
-    return;
-  }
-
-  remove(ref(db, `usuarios/${uid}`));
-};
-
-</script>
+</body>
+</html>
