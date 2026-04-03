@@ -1,3 +1,14 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema</title>
+
+</head>
+
+<body>
+
 <button id="btnLogout">Sair</button>
 
 <input id="lote" placeholder="Lote">
@@ -7,13 +18,27 @@
 <div id="lista"></div>
 
 <script type="module">
+
+let isAdmin = false;
+let setorUsuario = null;
 import {
   criarMaterial,
   listarMateriais,
-  atualizarStatus
+  atualizarStatus,
+  deletarMaterial
 } from './crud.js';
 
 import { logout } from './auth.js';
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  ref,
+  get,
+  set,
+  onValue,
+  update,
+  remove
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 // LOGOUT
 document.getElementById("btnLogout").addEventListener("click", async () => {
@@ -29,33 +54,84 @@ document.getElementById("btnCadastrar").addEventListener("click", () => {
   criarMaterial(lote, descricao);
 });
 
-// LISTAR
-listarMateriais((dados) => {
-  const lista = document.getElementById("lista");
-  lista.innerHTML = "";
+// ATUALIZAR STATUS
+window.mudar = (id, status) => {
+  if (!isAdmin && setorUsuario !== status) {
+    alert("Sem permissão!");
+    return;
+  }
 
-  for (let id in dados) {
-    let m = dados[id];
+  atualizarStatus(id, status);
+};
 
-    lista.innerHTML += `
-      <div>
-        ${m.descricao} (${m.lote})<br>
-        Status: ${m.status}
+// AUTH
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
 
-        <select onchange="mudar('${id}', this.value)">
-          <option ${m.status === "expurgo" ? "selected" : ""}>expurgo</option>
-          <option ${m.status === "lavagem" ? "selected" : ""}>lavagem</option>
-          <option ${m.status === "esterilizacao" ? "selected" : ""}>esterilizacao</option>
-          <option ${m.status === "distribuicao" ? "selected" : ""}>distribuicao</option>
-        </select>
-      </div>
-      <hr>
-    `;
+const snap = await get(ref(db, `usuarios/${user.uid}`));
+
+let dados = snap.val();
+
+if (!dados) {
+  console.warn("Criando usuário no DB...");
+
+  dados = {
+    email: user.email,
+    setor: "expurgo"
+  };
+
+  await set(ref(db, `usuarios/${user.uid}`), dados);
+}
+
+// AGORA SEMPRE EXISTE
+setorUsuario = dados.setor;
+isAdmin = setorUsuario === "admin";
+
+    // LISTAR
+    listarMateriais((dados) => {
+      const lista = document.getElementById("lista");
+      lista.innerHTML = "";
+
+      if (!dados) return;
+
+      for (let id in dados) {
+        let m = dados[id];
+
+        lista.innerHTML += `
+          <div>
+            ${m.descricao} (${m.lote})<br>
+            Status: ${m.status}
+
+            <select onchange="mudar('${id}', this.value)">
+              <option ${m.status === "expurgo" ? "selected" : ""}>expurgo</option>
+              <option ${m.status === "lavagem" ? "selected" : ""}>lavagem</option>
+              <option ${m.status === "esterilizacao" ? "selected" : ""}>esterilizacao</option>
+              <option ${m.status === "distribuicao" ? "selected" : ""}>distribuicao</option>
+            </select>
+
+            ${isAdmin ? `<button onclick="excluir('${id}')">Excluir</button>` : ''}
+          </div>
+          <hr>
+        `;
+      }
+    });
+
+  } else {
+    window.location.href = "login.html";
   }
 });
 
-// ATUALIZAR STATUS
-window.mudar = (id, status) => {
-  atualizarStatus(id, status);
+// EXCLUIR
+window.excluir = (id) => {
+  if (!isAdmin) {
+    alert("Apenas admin pode excluir!");
+    return;
+  }
+
+  deletarMaterial(id);
 };
+
 </script>
+
+</body>
+</html>

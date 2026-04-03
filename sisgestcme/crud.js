@@ -4,12 +4,21 @@ import {
   push,
   onValue,
   update,
-  remove
+  remove,
+  off
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+let materiaisRef = ref(db, "materiais");
 
 // CREATE
 export function criarMaterial(lote, descricao) {
-  push(ref(db, "materiais"), {
+
+  if (!lote || !descricao) {
+    alert("Preencha todos os campos!");
+    return;
+  }
+
+  push(materiaisRef, {
     lote,
     descricao,
     status: "expurgo",
@@ -17,15 +26,21 @@ export function criarMaterial(lote, descricao) {
   });
 }
 
-// READ
+// READ (com controle de listener)
 export function listarMateriais(callback) {
-  onValue(ref(db, "materiais"), (snap) => {
+
+  off(materiaisRef); // evita duplicação
+
+  onValue(materiaisRef, (snap) => {
     callback(snap.val());
   });
 }
 
 // UPDATE
 export function atualizarStatus(id, status) {
+
+  if (!id || !status) return;
+
   update(ref(db, `materiais/${id}`), {
     status,
     ultimaAtualizacao: Date.now()
@@ -34,5 +49,10 @@ export function atualizarStatus(id, status) {
 
 // DELETE
 export function deletarMaterial(id) {
+
+  if (!id) return;
+
+  if (!confirm("Tem certeza que deseja excluir?")) return;
+
   remove(ref(db, `materiais/${id}`));
 }
