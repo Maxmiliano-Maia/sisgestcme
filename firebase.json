@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "sisgestcme",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

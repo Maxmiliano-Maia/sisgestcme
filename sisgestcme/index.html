@@ -1,0 +1,61 @@
+<button id="btnLogout">Sair</button>
+
+<input id="lote" placeholder="Lote">
+<input id="descricao" placeholder="Descrição">
+<button id="btnCadastrar">Cadastrar</button>
+
+<div id="lista"></div>
+
+<script type="module">
+import {
+  criarMaterial,
+  listarMateriais,
+  atualizarStatus
+} from './crud.js';
+
+import { logout } from './auth.js';
+
+// LOGOUT
+document.getElementById("btnLogout").addEventListener("click", async () => {
+  await logout();
+  window.location.href = "login.html";
+});
+
+// CRIAR MATERIAL
+document.getElementById("btnCadastrar").addEventListener("click", () => {
+  const lote = document.getElementById("lote").value;
+  const descricao = document.getElementById("descricao").value;
+
+  criarMaterial(lote, descricao);
+});
+
+// LISTAR
+listarMateriais((dados) => {
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  for (let id in dados) {
+    let m = dados[id];
+
+    lista.innerHTML += `
+      <div>
+        ${m.descricao} (${m.lote})<br>
+        Status: ${m.status}
+
+        <select onchange="mudar('${id}', this.value)">
+          <option ${m.status === "expurgo" ? "selected" : ""}>expurgo</option>
+          <option ${m.status === "lavagem" ? "selected" : ""}>lavagem</option>
+          <option ${m.status === "esterilizacao" ? "selected" : ""}>esterilizacao</option>
+          <option ${m.status === "distribuicao" ? "selected" : ""}>distribuicao</option>
+        </select>
+      </div>
+      <hr>
+    `;
+  }
+});
+
+// ATUALIZAR STATUS
+window.mudar = (id, status) => {
+  atualizarStatus(id, status);
+};
+</script>

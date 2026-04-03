@@ -1,0 +1,36 @@
+<input id="email" placeholder="Email">
+<input id="senha" type="password" placeholder="Senha">
+
+<button id="btnEntrar">Entrar</button>
+<button id="btnRegistrar">Registrar</button>
+
+<script type="module">
+import { login, cadastrar } from './auth.js';
+
+// LOGIN
+document.getElementById("btnEntrar").addEventListener("click", async () => {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+
+  try {
+    await login(email, senha);
+    window.location.href = "index.html";
+  } catch (e) {
+    alert(e.message);
+  }
+});
+
+// REGISTRAR
+document.getElementById("btnRegistrar").addEventListener("click", async () => {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+
+  try {
+    await cadastrar(email, senha);
+    alert("Usuário criado!");
+  } catch (e) {
+    alert(e.message);
+  }
+});
+
+</script>
