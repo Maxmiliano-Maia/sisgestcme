@@ -12,7 +12,12 @@
 
 <input id="email" type="email" placeholder="Email" required autocomplete="username">
 
-<input id="senha" type="password" placeholder="Senha" required autocomplete="username">
+<input id="senha" type="password" placeholder="Senha" required autocomplete="current-password">
+
+<label>
+<input type="checkbox" id="lembrar">
+Lembrar meu email
+</label>
 
 <select id="setor">
   <option value="expurgo">Expurgo</option>
@@ -60,6 +65,8 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/fi
 const emailInput = document.getElementById("email");
 const senhaInput = document.getElementById("senha");
 const setorInput = document.getElementById("setor");
+const lembrar = document.getElementById("lembrar").checked;
+const emailSalvo = localStorage.getItem("emailSalvo");
 
 const btnEntrar = document.getElementById("btnEntrar");
 const btnRegistrar = document.getElementById("btnRegistrar");
@@ -71,6 +78,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
   const email = emailInput.value.trim();
   const senha = senhaInput.value.trim();
+  const lembrar = document.getElementById("lembrar").checked;
 
   if (!email || !senha) {
     alert("Preencha email e senha!");
@@ -79,12 +87,23 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
   try {
     await login(email, senha);
+    if (lembrar) {
+      localStorage.setItem("emailSalvo", email);
+    } else {
+      localStorage.removeItem("emailSalvo");
+    }
+
     window.location.replace("index.html");
   } catch (e) {
     alert("Erro ao logar: " + e.message);
   }
 
 });
+
+if (emailSalvo) {
+  document.getElementById("email").value = emailSalvo;
+  document.getElementById("lembrar").checked = true;
+}
 
 // REGISTRAR
 btnRegistrar.addEventListener("click", async () => {
