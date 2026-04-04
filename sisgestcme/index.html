@@ -21,6 +21,9 @@
 <input id="descricao" placeholder="Descrição">
 <button id="btnCadastrar">Cadastrar</button>
 
+<br><br>
+<input type="text" id="pesquisa" placeholder="Pesquisar por lote ou descrição">
+
 <div id="lista"></div>
 
 <script type="module">
@@ -135,80 +138,69 @@ info.style.padding = "10px";
 info.style.marginBottom = "10px";
 info.style.width = "fit-content";
 
+
+
+const campoPesquisa = document.getElementById("pesquisa"); // novo input de pesquisa
+
+campoPesquisa.addEventListener("input", () => {
+  const filtro = campoPesquisa.value.toLowerCase(); // texto digitado
+
   listarMateriais((dados) => {
     const lista = document.getElementById("lista");
     lista.innerHTML = "";
 
     if (!dados) return;
 
-for (let id in dados) {
+    for (let id in dados) {
+      let m = dados[id];
 
-  let m = dados[id];
+      // 🔎 FILTRO: exibe apenas se lote ou descrição contiver o texto
+      if (!m.lote.toLowerCase().includes(filtro) &&
+          !m.descricao.toLowerCase().includes(filtro)) {
+        continue; // pula este item
+      }
 
-  const div = document.createElement("div");
+      const div = document.createElement("div");
 
-  // texto descrição
-  const texto = document.createElement("div");
-  texto.textContent = `${m.descricao} (${m.lote})`;
-  div.appendChild(texto);
+      // texto descrição
+      const texto = document.createElement("div");
+      texto.textContent = `${m.descricao} (${m.lote})`;
+      div.appendChild(texto);
 
-  // status
-  const status = document.createElement("div");
-  status.textContent = `Status: ${m.status}`;
-  div.appendChild(status);
+      // status
+      const status = document.createElement("div");
+      status.textContent = `Status: ${m.status}`;
+      div.appendChild(status);
 
-  // select
-  const select = document.createElement("select");
+      // select de setores
+      const select = document.createElement("select");
+      const setores = ["expurgo", "lavagem", "preparo", "esterilizacao", "distribuicao"];
+      setores.forEach(s => {
+        const option = document.createElement("option");
+        option.value = s;
+        option.textContent = s;
+        if (m.status === s) option.selected = true;
+        select.appendChild(option);
+      });
 
-const setores = [
-  "expurgo",
-  "lavagem",
-  "preparo",
-  "esterilizacao",
-  "distribuicao"
-];
+      select.addEventListener("change", (e) => {
+        mudar(id, e.target.value);
+      });
+      div.appendChild(select);
 
-  setores.forEach(s => {
+      // botão excluir (apenas admin)
+      if (isAdmin) {
+        const btn = document.createElement("button");
+        btn.textContent = "Excluir";
+        btn.addEventListener("click", () => excluir(id));
+        div.appendChild(btn);
+      }
 
-    const option = document.createElement("option");
-    option.value = s;
-    option.textContent = s;
-
-    if (m.status === s) {
-      option.selected = true;
+      lista.appendChild(div);
+      lista.appendChild(document.createElement("hr"));
     }
-
-    select.appendChild(option);
-
   });
-
-  select.addEventListener("change", (e) => {
-    mudar(id, e.target.value);
-  });
-
-  div.appendChild(select);
-
-  // botão excluir
-  if (isAdmin) {
-
-    const btn = document.createElement("button");
-    btn.textContent = "Excluir";
-
-    btn.addEventListener("click", () => {
-      excluir(id);
-    });
-
-    div.appendChild(btn);
-
-  }
-
-  lista.appendChild(div);
-
-  const hr = document.createElement("hr");
-  lista.appendChild(hr);
-
-}
-  });
+});
 });
 
 btnUsuarios.addEventListener("click", () => {
