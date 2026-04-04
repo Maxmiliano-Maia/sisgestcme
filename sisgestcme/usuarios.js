@@ -74,7 +74,7 @@ for (let uid in dados) {
   let u = dados[uid];
 
   const div = document.createElement("div");
-  div.style.border = "1px solid #ccc";
+  div.style.border = "3px solid #ccc";
   div.style.padding = "10px";
   div.style.margin = "10px";
 
