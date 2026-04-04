@@ -36,7 +36,8 @@ import {
   criarMaterial,
   listarMateriais,
   atualizarStatus,
-  deletarMaterial
+  deletarMaterial,
+  atualizarLote
 } from './crud.js';
 
 import { logout } from './auth.js';
@@ -182,7 +183,21 @@ campoPesquisa.addEventListener("input", () => {
 
       // texto descrição
       const texto = document.createElement("div");
-      texto.textContent = `${m.descricao} (${m.lote})`;
+
+      const descricao = document.createElement("span");
+      descricao.textContent = m.descricao + " ";
+      texto.appendChild(descricao);
+
+      const loteInput = document.createElement("input");
+      loteInput.value = m.lote;
+      loteInput.style.width = "100px";
+
+      loteInput.addEventListener("change", () => {
+        atualizarLote(id, loteInput.value);
+      });
+
+      texto.appendChild(loteInput);
+
       div.appendChild(texto);
 
       // status

@@ -56,3 +56,9 @@ export function deletarMaterial(id) {
 
   remove(ref(db, `materiais/${id}`));
 }
+
+export function atualizarLote(id, novoLote) {
+  update(ref(db, `materiais/${id}`), {
+    lote: novoLote
+  });
+}
