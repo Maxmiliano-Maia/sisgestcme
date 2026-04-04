@@ -19,14 +19,6 @@
 Lembrar meu email
 </label>
 
-<select id="setor">
-  <option value="expurgo">Expurgo</option>
-  <option value="lavagem">Lavagem</option>
-  <option value="preparo">Preparo</option>
-  <option value="esterilizacao">Esterilização</option>
-  <option value="distribuicao">Distribuição</option>
-</select>
-
 <button type="submit" id="btnEntrar">Entrar</button>
 <button type="button" id="btnResetSenha">
 Esqueci minha senha
@@ -116,36 +108,26 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   try {
-await login(email, senha);
+    await login(email, senha);
 
-if (lembrar) {
-
-  const setor = setorInput.value;
-
-  localStorage.setItem("emailSalvo", email);
-  localStorage.setItem("setorSalvo", setor);
-
-} else {
-
-  localStorage.removeItem("emailSalvo");
-  localStorage.removeItem("setorSalvo");
-
-}
+    if (lembrar) {
+      localStorage.setItem("emailSalvo", email);
+    } else {
+      localStorage.removeItem("emailSalvo");
+    }
 
     window.location.replace("index.html");
   } catch (e) {
     alert("Erro ao logar: " + e.message);
   }
-
 });
 
-if (emailSalvo && setorSalvo) {
+if (emailSalvo) {
 
   document.getElementById("loginRapido").style.display = "block";
   document.getElementById("loginForm").style.display = "none";
 
   document.getElementById("emailRapido").textContent = emailSalvo;
-  document.getElementById("setorRapido").textContent = "Setor: " + setorSalvo;
 
   const avatar = document.getElementById("avatarUsuario");
   avatar.textContent = simboloSetor(setorSalvo);
@@ -193,6 +175,7 @@ function simboloSetor(setor){
 
   return icones[setor] || "🏥";
 }
+
 
 </script>
 
