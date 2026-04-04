@@ -36,11 +36,11 @@ onAuthStateChanged(auth, async (user) => {
   const snap = await get(ref(db, `usuarios/${user.uid}`));
   const dados = snap.val();
 
-  if (!dados || dados.setor !== "admin") {
-    alert("Acesso negado!");
-    window.location.href = "index.html";
-    return;
-  }
+if (!dados || dados.permissao !== "admin") {
+  alert("Acesso negado!");
+  window.location.href = "index.html";
+  return;
+}
 
   console.log("É ADMIN ✅");
   isAdmin = true;
@@ -78,12 +78,12 @@ for (let uid in dados) {
 
   div.appendChild(document.createElement("br"));
 
-  // texto setor
+  // -------- SETOR --------
+
   const textoSetor = document.createElement("span");
   textoSetor.textContent = "Setor: ";
   div.appendChild(textoSetor);
 
-  // select
   const select = document.createElement("select");
 
   const setores = [
@@ -91,8 +91,7 @@ for (let uid in dados) {
     "lavagem",
     "preparo",
     "esterilizacao",
-    "distribuicao",
-    "admin"
+    "distribuicao"
   ];
 
   setores.forEach(s => {
@@ -115,6 +114,38 @@ for (let uid in dados) {
 
   div.appendChild(select);
 
+  // -------- PERMISSÃO --------
+
+  div.appendChild(document.createElement("br"));
+
+  const textoPerm = document.createElement("span");
+  textoPerm.textContent = "Permissão: ";
+  div.appendChild(textoPerm);
+
+  const selectPermissao = document.createElement("select");
+
+  const permissoes = ["usuario", "admin"];
+
+  permissoes.forEach(p => {
+
+    const option = document.createElement("option");
+    option.value = p;
+    option.textContent = p;
+
+    if (u.permissao === p) {
+      option.selected = true;
+    }
+
+    selectPermissao.appendChild(option);
+
+  });
+
+  selectPermissao.addEventListener("change", (e) => {
+    alterarPermissao(uid, e.target.value);
+  });
+
+  div.appendChild(selectPermissao);
+
   listaUsuarios.appendChild(div);
 
 }
@@ -130,6 +161,18 @@ window.alterarSetor = (uid, novoSetor) => {
   update(ref(db, `usuarios/${uid}`), {
     setor: novoSetor
   });
+};
+
+window.alterarPermissao = (uid, novaPermissao) => {
+
+  if (!isAdmin) return;
+
+  if (!confirm("Alterar permissão do usuário?")) return;
+
+  update(ref(db, `usuarios/${uid}`), {
+    permissao: novaPermissao
+  });
+
 };
 
 // ❌ EXCLUIR

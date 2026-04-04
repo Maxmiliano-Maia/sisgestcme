@@ -35,15 +35,42 @@ Esqueci minha senha
 
 </form>
 
-<div id="loginRapido" style="display:none; border:1px solid #ccc; padding:15px; margin-bottom:20px;">
-  <div id="emailRapido"></div>
+<div id="loginRapido" style="
+display:none;
+border:1px solid #ccc;
+padding:20px;
+width:250px;
+text-align:center;
+margin-bottom:20px;
+">
 
-  <button id="btnContinuar">Continuar</button>
-  <button id="btnOutraConta">Usar outra conta</button>
+<div id="avatarUsuario" style="
+width:70px;
+height:70px;
+border-radius:50%;
+background:#1976d2;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:32px;
+margin:auto;
+margin-bottom:10px;
+">
+</div>
+
+<div id="emailRapido" style="font-weight:bold;margin-bottom:5px;"></div>
+<div id="setorRapido" style="margin-bottom:15px;color:#666;"></div>
+
+<button type="button" id="btnContinuar">Entrar</button>
+<br><br>
+<button type="button" id="btnOutraConta">Usar outra conta</button>
+
 </div>
 
 <script type="module">
 let emailSalvo = localStorage.getItem("emailSalvo");
+let setorSalvo = localStorage.getItem("setorSalvo");
 import { recuperarSenha } from "./auth.js";
 
 document
@@ -84,20 +111,28 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const email = emailInput.value.trim();
   const senha = senhaInput.value.trim();
   const lembrar = document.getElementById("lembrar").checked;
-
-
+  
   if (!email || !senha) {
     alert("Preencha email e senha!");
     return;
   }
 
   try {
-    await login(email, senha);
-    if (lembrar) {
-      localStorage.setItem("emailSalvo", email);
-    } else {
-      localStorage.removeItem("emailSalvo");
-    }
+await login(email, senha);
+
+if (lembrar) {
+
+  const setor = setorInput.value;
+
+  localStorage.setItem("emailSalvo", email);
+  localStorage.setItem("setorSalvo", setor);
+
+} else {
+
+  localStorage.removeItem("emailSalvo");
+  localStorage.removeItem("setorSalvo");
+
+}
 
     window.location.replace("index.html");
   } catch (e) {
@@ -106,11 +141,17 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
 });
 
-if (emailSalvo && emailSalvo !== "") {
-  document.getElementById("loginRapido").style.display = "block";
-  document.getElementById("emailRapido").textContent = "Continuar como: " + emailSalvo;
+if (emailSalvo && setorSalvo) {
 
+  document.getElementById("loginRapido").style.display = "block";
   document.getElementById("loginForm").style.display = "none";
+
+  document.getElementById("emailRapido").textContent = emailSalvo;
+  document.getElementById("setorRapido").textContent = "Setor: " + setorSalvo;
+
+  const avatar = document.getElementById("avatarUsuario");
+  avatar.textContent = simboloSetor(setorSalvo);
+
 }
 
 // REGISTRAR
@@ -163,11 +204,26 @@ document.getElementById("btnContinuar").addEventListener("click", () => {
 document.getElementById("btnOutraConta").addEventListener("click", () => {
 
   localStorage.removeItem("emailSalvo");
+  localStorage.removeItem("setorSalvo");
 
   document.getElementById("loginRapido").style.display = "none";
   document.getElementById("loginForm").style.display = "block";
 
 });
+
+function simboloSetor(setor){
+
+  const icones = {
+    expurgo: "🧼",
+    lavagem: "🚿",
+    preparo: "🛠️",
+    esterilizacao: "♨️",
+    distribuicao: "📦",
+    admin: "⚕️"
+  };
+
+  return icones[setor] || "🏥";
+}
 
 </script>
 

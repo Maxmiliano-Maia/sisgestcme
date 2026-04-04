@@ -26,7 +26,9 @@
 <script type="module">
 
 let isAdmin = false;
+let permissaoUsuario = null;
 let setorUsuario = null;
+
 import {
   criarMaterial,
   listarMateriais,
@@ -83,23 +85,28 @@ onAuthStateChanged(auth, async (user) => {
   let dados = snap.val();
 
   if (!dados) {
-    dados = {
-      email: user.email,
-      setor: "expurgo"
-    };
 
-    await set(ref(db, `usuarios/${user.uid}`), dados);
+ dados = {
+  email: user.email,
+  setor: "expurgo",
+  permissao: "usuario"
+};
+
+  await set(ref(db, `usuarios/${user.uid}`), dados);
   }
 
-  setorUsuario = dados.setor;
-  isAdmin = dados?.setor === "admin";
+setorUsuario = dados.setor;
+permissaoUsuario = dados.permissao || "usuario";
+
+isAdmin = permissaoUsuario === "admin";
 
   if (isAdmin) {
     btnUsuarios.style.display = "inline-block";
   }
 
-  const info = document.getElementById("infoUsuario");
-  info.textContent = `Usuário: ${dados.email} | Permissão: ${dados.setor}`;
+const info = document.getElementById("infoUsuario");
+info.textContent =
+`Usuário: ${dados.email} | Setor: ${dados.setor} | Permissão: ${permissaoUsuario}`;
 
 
   listarMateriais((dados) => {
