@@ -104,10 +104,36 @@ isAdmin = permissaoUsuario === "admin";
     btnUsuarios.style.display = "inline-block";
   }
 
-const info = document.getElementById("infoUsuario");
-info.textContent =
-`Usuário: ${dados.email} | Setor: ${dados.setor} | Permissão: ${permissaoUsuario}`;
+const avatarSetor = {
+  expurgo: "🧹",
+  lavagem: "🧼",
+  preparo: "🧪",
+  esterilizacao: "🔥",
+  distribuicao: "📦"
+};
 
+const avatar = avatarSetor[dados.setor] || "👤";
+
+const info = document.getElementById("infoUsuario");
+
+info.innerHTML = `
+<div style="font-weight:bold;font-size:16px;">
+  ${avatar} ${dados.email}
+</div>
+
+<div>
+  🏥 ${dados.setor}
+</div>
+
+<div>
+  🔑 ${permissaoUsuario}
+</div>
+`;
+
+info.style.border = "1px solid #ccc";
+info.style.padding = "10px";
+info.style.marginBottom = "10px";
+info.style.width = "fit-content";
 
   listarMateriais((dados) => {
     const lista = document.getElementById("lista");
@@ -134,12 +160,13 @@ for (let id in dados) {
   // select
   const select = document.createElement("select");
 
-  const setores = [
-    "expurgo",
-    "lavagem",
-    "esterilizacao",
-    "distribuicao"
-  ];
+const setores = [
+  "expurgo",
+  "lavagem",
+  "preparo",
+  "esterilizacao",
+  "distribuicao"
+];
 
   setores.forEach(s => {
 

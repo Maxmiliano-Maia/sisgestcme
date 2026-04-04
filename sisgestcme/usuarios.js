@@ -9,6 +9,31 @@ import {
   get
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+import { createUserWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { set } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAOLP_uGOCGJLW2y8df69zw13q7JpLbnzk",
+  authDomain: "sisgestcme.firebaseapp.com",
+
+  // 👇 ESSA LINHA ESTAVA FALTANDO
+  databaseURL: "https://sisgestcme-default-rtdb.firebaseio.com",
+
+  projectId: "sisgestcme",
+  storageBucket: "sisgestcme.firebasestorage.app",
+  messagingSenderId: "391084451116",
+  appId: "1:391084451116:web:bff3c0aeaea67bd1d7f889",
+  measurementId: "G-X2RPP78N6J"
+};
+
+const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+const secondaryAuth = getAuth(secondaryApp);
+
 document.getElementById("btnVoltar").addEventListener("click", () => {
   window.location.href = "index.html";
 });
@@ -79,26 +104,26 @@ for (let uid in dados) {
   div.style.margin = "10px";
 
   // email
-const avatar = avatarSetor[u.setor] || "👤";
+  const avatar = avatarSetor[u.setor] || "👤";
 
-const email = document.createElement("div");
-email.textContent = `${avatar} ${u.email}`;
-email.style.fontWeight = "bold";
-email.style.fontSize = "16px";
+  const email = document.createElement("div");
+  email.textContent = `${avatar} ${u.email}`;
+  email.style.fontWeight = "bold";
+  email.style.fontSize = "16px";
 
-div.appendChild(email);
+  div.appendChild(email);
 
-const setor = document.createElement("div");
-setor.textContent = "🏥 " + u.setor;
-div.appendChild(setor);
-div.appendChild(document.createElement("br"));
+  const setor = document.createElement("div");
+  setor.textContent = "🏥 " + u.setor;
+  div.appendChild(setor);
 
-const perm = document.createElement("div");
-perm.textContent = "🔑 " + u.permissao;
-div.appendChild(perm);
+  const perm = document.createElement("div");
+  perm.textContent = "🔑 " + u.permissao;
+  div.appendChild(perm);
+
+  div.appendChild(document.createElement("br"));
 
   // -------- SETOR --------
-
   const textoSetor = document.createElement("span");
   textoSetor.textContent = "Setor: ";
   div.appendChild(textoSetor);
@@ -175,7 +200,7 @@ div.appendChild(perm);
 window.alterarSetor = (uid, novoSetor) => {
   if (!isAdmin) return;
 
-  if (!confirm("Alterar permissão do usuário?")) return;
+  if (!confirm("Alterar setor do usuário?")) return;
 
   update(ref(db, `usuarios/${uid}`), {
     setor: novoSetor
@@ -205,3 +230,53 @@ window.removerUsuario = (uid) => {
 
   remove(ref(db, `usuarios/${uid}`));
 };
+
+document.getElementById("btnCriarUsuario").addEventListener("click", async () => {
+
+  if (!isAdmin) {
+    alert("Apenas admin pode criar usuários!");
+    return;
+  }
+
+  const email = document.getElementById("novoEmail").value.trim();
+  const senha = document.getElementById("novaSenha").value.trim();
+  const setor = document.getElementById("novoSetor").value;
+  const permissao = document.getElementById("novaPermissao").value;
+
+    if (!email.includes("@")) {
+    alert("Email inválido");
+    return;
+  }
+
+  if (senha.length < 6) {
+    alert("Senha precisa ter pelo menos 6 caracteres");
+    return;
+  }
+
+  try {
+
+const cred = await createUserWithEmailAndPassword(
+  secondaryAuth,
+  email,
+  senha
+);
+
+// UID do novo usuário
+const uid = cred.user.uid;
+
+// salvar no banco
+await set(ref(db, `usuarios/${uid}`), {
+  email: email,
+  setor: setor,
+  permissao: permissao
+});
+
+alert("Usuário criado!");
+
+  } catch (erro) {
+
+    alert("Erro: " + erro.code);
+
+  }
+
+});

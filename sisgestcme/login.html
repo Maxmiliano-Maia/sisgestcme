@@ -31,7 +31,6 @@ Lembrar meu email
 <button type="button" id="btnResetSenha">
 Esqueci minha senha
 </button>
-<button type="button" id="btnRegistrar">Registrar</button>
 
 </form>
 
@@ -101,7 +100,6 @@ const emailInput = document.getElementById("email");
 const senhaInput = document.getElementById("senha");
 const setorInput = document.getElementById("setor");
 const btnEntrar = document.getElementById("btnEntrar");
-const btnRegistrar = document.getElementById("btnRegistrar");
 
 // LOGIN
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -153,35 +151,6 @@ if (emailSalvo && setorSalvo) {
   avatar.textContent = simboloSetor(setorSalvo);
 
 }
-
-// REGISTRAR
-btnRegistrar.addEventListener("click", async () => {
-
-  const email = emailInput.value.trim();
-  const senha = senhaInput.value.trim();
-  const setor = setorInput.value;
-
-  if (!email || !senha) {
-    alert("Preencha todos os campos!");
-    return;
-  }
-
-  if (senha.length < 6) {
-    alert("Senha precisa ter pelo menos 6 caracteres!");
-    return;
-  }
-
-  btnRegistrar.disabled = true;
-
-  try {
-    await cadastrar(email, senha, setor);
-    alert("Usuário criado!");
-  } catch (e) {
-    alert("Erro ao cadastrar: " + e.message);
-  }
-
-  btnRegistrar.disabled = false;
-});
 
 // REDIRECIONAMENTO AUTOMÁTICO
 onAuthStateChanged(auth, (user) => {
