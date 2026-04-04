@@ -107,6 +107,26 @@ isAdmin = permissaoUsuario === "admin";
     btnUsuarios.style.display = "inline-block";
   }
 
+    listarMateriais((materiais) => {
+    atualizarListaMateriais(materiais); // função que monta a lista
+  });
+
+  function atualizarListaMateriais(dados) {
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  if (!dados) return;
+
+  for (let id in dados) {
+    const m = dados[id];
+
+    const div = document.createElement("div");
+    div.textContent = `${m.descricao} (${m.lote}) - Status: ${m.status}`;
+
+    lista.appendChild(div);
+  }
+}
+
 const avatarSetor = {
   expurgo: "🧹",
   lavagem: "🧼",
