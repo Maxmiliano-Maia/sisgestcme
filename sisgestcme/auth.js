@@ -14,30 +14,47 @@ import {
 
 
 // CADASTRAR COM SETOR
-export async function cadastrar(email, senha, setor) {
+export async function cadastrar(email, senha) {
+
   try {
+
     const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
 
-    const uid = userCredential.user.uid;
-
-    console.log("Criado no Auth:", uid);
-
-    await set(ref(db, `usuarios/${uid}`), {
-      email,
-      setor
-    });
-
-    console.log("Salvo no DB!");
+    console.log("Usuário criado:", userCredential.user);
 
   } catch (error) {
-    console.error("Erro no cadastro:", error);
-    alert(error.message);
+
+    if (error.code === "auth/email-already-in-use") {
+
+      alert("Este email já está cadastrado. Faça login.");
+
+    } else {
+
+      console.error("Erro no cadastro:", error);
+      alert(error.message);
+
+    }
+
   }
+
 }
 
 // LOGIN
-export function login(email, senha) {
-  return signInWithEmailAndPassword(auth, email, senha);
+export async function login(email, senha) {
+  try {
+
+    const cred = await signInWithEmailAndPassword(auth, email, senha);
+
+    console.log("LOGIN OK:", cred.user);
+
+  } catch (error) {
+
+    console.log("ERRO FIREBASE:", error.code);
+    console.log(error);
+
+    alert(error.code);
+
+  }
 }
 
 // LOGOUT

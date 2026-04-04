@@ -64,6 +64,13 @@ function carregarUsuarios() {
 
 for (let uid in dados) {
 
+  let avatarSetor = {
+  expurgo: "🧹",
+  lavagem: "🧼",
+  preparo: "🧪",
+  esterilizacao: "🔥",
+  distribuicao: "📦"
+};
   let u = dados[uid];
 
   const div = document.createElement("div");
@@ -72,11 +79,23 @@ for (let uid in dados) {
   div.style.margin = "10px";
 
   // email
-  const strong = document.createElement("strong");
-  strong.textContent = u.email;
-  div.appendChild(strong);
+const avatar = avatarSetor[u.setor] || "👤";
 
-  div.appendChild(document.createElement("br"));
+const email = document.createElement("div");
+email.textContent = `${avatar} ${u.email}`;
+email.style.fontWeight = "bold";
+email.style.fontSize = "16px";
+
+div.appendChild(email);
+
+const setor = document.createElement("div");
+setor.textContent = "🏥 " + u.setor;
+div.appendChild(setor);
+div.appendChild(document.createElement("br"));
+
+const perm = document.createElement("div");
+perm.textContent = "🔑 " + u.permissao;
+div.appendChild(perm);
 
   // -------- SETOR --------
 
