@@ -106,12 +106,11 @@ for (let uid in dados) {
   // email
   const avatar = avatarSetor[u.setor] || "👤";
 
-  const email = document.createElement("div");
-  email.textContent = `${avatar} ${u.email}`;
-  email.style.fontWeight = "bold";
-  email.style.fontSize = "16px";
-
-  div.appendChild(email);
+  const nome = document.createElement("div");
+  nome.textContent = `${avatar} ${u.nome} (${u.email})`;
+  nome.style.fontWeight = "bold";
+  nome.style.fontSize = "16px";
+  div.appendChild(nome);
 
   const setor = document.createElement("div");
   setor.textContent = "🏥 " + u.setor;
@@ -172,15 +171,15 @@ for (let uid in dados) {
 
   permissoes.forEach(p => {
 
-    const option = document.createElement("option");
-    option.value = p;
-    option.textContent = p;
+  const option = document.createElement("option");
+  option.value = p;
+  option.textContent = p;
 
-    if (u.permissao === p) {
-      option.selected = true;
-    }
+  if (u.permissao === p) {
+    option.selected = true;
+  }
 
-    selectPermissao.appendChild(option);
+  selectPermissao.appendChild(option);
 
   });
 
@@ -238,6 +237,7 @@ document.getElementById("btnCriarUsuario").addEventListener("click", async () =>
     return;
   }
 
+  const nome = document.getElementById("novoNome").value.trim();
   const email = document.getElementById("novoEmail").value.trim();
   const senha = document.getElementById("novaSenha").value.trim();
   const setor = document.getElementById("novoSetor").value;
@@ -266,12 +266,17 @@ const uid = cred.user.uid;
 
 // salvar no banco
 await set(ref(db, `usuarios/${uid}`), {
+  nome: nome,
   email: email,
   setor: setor,
   permissao: permissao
 });
 
 alert("Usuário criado!");
+
+    document.getElementById("novoNome").value = "";
+    document.getElementById("novoEmail").value = "";
+    document.getElementById("novaSenha").value = "";
 
   } catch (erro) {
 

@@ -118,7 +118,7 @@ const info = document.getElementById("infoUsuario");
 
 info.innerHTML = `
 <div style="font-weight:bold;font-size:16px;">
-  ${avatar} ${dados.email}
+  ${avatar} ${dados.nome || "Sem nome"} (${dados.email})
 </div>
 
 <div>
